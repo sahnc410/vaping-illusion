@@ -1,0 +1,1066 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>The Vaping Illusion — see what vaping hides</title>
+<meta name="description" content="A student-built interactive project on youth vaping: test your perception, see the real data, and find free help to quit.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,700;12..96,800&family=Inter:wght@400;500;600&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<style>
+  :root{
+    --ink:#171327; --ink-2:#211a3b; --panel:#2a2150; --line:#3a2f63;
+    --haze:#8a7db8; --mist:#c9bdee; --paper:#f5f1ff;
+    --burn:#ff5c6e; --burn-soft:#ff8a96; --gain:#43e0c0; --gold:#ffc861;
+    --shadow:0 24px 60px -20px rgba(0,0,0,.6);
+    --maxw:920px;
+  }
+  *{box-sizing:border-box}
+  html{-webkit-text-size-adjust:100%;scroll-behavior:smooth}
+  body{
+    margin:0;color:var(--paper);line-height:1.55;min-height:100vh;
+    font-family:"Inter",system-ui,-apple-system,sans-serif;-webkit-font-smoothing:antialiased;
+    background:
+      radial-gradient(120% 70% at 10% -5%, rgba(255,92,110,.15), transparent 50%),
+      radial-gradient(120% 80% at 100% 5%, rgba(67,224,192,.10), transparent 48%),
+      var(--ink);
+  }
+  @media (prefers-reduced-motion:reduce){
+    html{scroll-behavior:auto}
+    *{animation:none!important;transition:none!important}
+  }
+
+  /* ================= NAV ================= */
+  nav{position:sticky;top:0;z-index:50;backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);
+    background:rgba(23,19,39,.78);border-bottom:1px solid var(--line)}
+  .nav-in{max-width:var(--maxw);margin:0 auto;padding:12px clamp(16px,4vw,40px);
+    display:flex;align-items:center;justify-content:space-between;gap:14px}
+  .brand{font-family:"Bricolage Grotesque",sans-serif;font-weight:800;font-size:17px;letter-spacing:-.01em;white-space:nowrap}
+  .brand span{color:var(--burn)}
+  .nav-links{display:flex;gap:2px;flex-wrap:wrap;justify-content:flex-end}
+  .nav-links a{font-family:"Space Mono",monospace;font-size:11.5px;letter-spacing:.03em;color:var(--mist);
+    text-decoration:none;padding:6px 8px;border-radius:8px;transition:background .15s,color .15s;white-space:nowrap}
+  .nav-links a:hover{background:var(--ink-2);color:var(--paper)}
+  .nav-links a.cta{background:var(--burn);color:#fff;font-weight:700}
+  .nav-links a:focus-visible{outline:2px solid var(--haze);outline-offset:2px}
+  @media(max-width:720px){.nav-links a:not(.cta){display:none}}
+
+  /* ================= LAYOUT ================= */
+  main{max-width:var(--maxw);margin:0 auto;padding:0 clamp(16px,4vw,40px)}
+  section{padding:clamp(56px,9vw,92px) 0;scroll-margin-top:64px}
+  section + section{border-top:1px solid var(--line)}
+  .eyebrow{font-family:"Space Mono",monospace;font-size:12px;letter-spacing:.22em;text-transform:uppercase;
+    color:var(--haze);display:flex;align-items:center;gap:10px;margin:0 0 18px}
+  .eyebrow::before{content:"";width:26px;height:1px;background:var(--haze)}
+  h2{font-family:"Bricolage Grotesque",sans-serif;font-weight:800;letter-spacing:-.02em;line-height:1.02;
+    font-size:clamp(28px,5.6vw,44px);margin:0 0 16px}
+  h3{font-family:"Bricolage Grotesque",sans-serif;font-weight:700;font-size:clamp(17px,2.6vw,21px);margin:0 0 6px;letter-spacing:-.01em}
+  .sec-lede{color:var(--mist);font-size:clamp(15px,2.2vw,17.5px);max-width:58ch;margin:0}
+  em.g{font-style:normal;color:var(--gain)} em.b{font-style:normal;color:var(--burn)} em.y{font-style:normal;color:var(--gold)}
+  .reveal{opacity:0;transform:translateY(18px);transition:opacity .6s ease,transform .6s cubic-bezier(.2,.8,.2,1)}
+  .reveal.in{opacity:1;transform:none}
+  .panel{background:linear-gradient(180deg,var(--ink-2),rgba(33,26,59,.5));border:1px solid var(--line);
+    border-radius:20px;padding:clamp(18px,3.6vw,28px);box-shadow:var(--shadow)}
+  .mt{margin-top:26px}
+
+  /* ================= HERO ================= */
+  .hero{padding:clamp(56px,12vw,110px) 0 clamp(40px,8vw,64px)}
+  .hero h1{font-family:"Bricolage Grotesque",sans-serif;font-weight:800;letter-spacing:-.03em;line-height:.97;
+    font-size:clamp(40px,9.4vw,80px);margin:.25em 0 .35em}
+  .hero h1 .vapor{color:transparent;background:linear-gradient(180deg,var(--mist),var(--haze));-webkit-background-clip:text;background-clip:text}
+  .hero p{color:var(--mist);font-size:clamp(16px,2.5vw,19px);max-width:50ch;margin:0 0 26px}
+  .hero-ctas{display:flex;flex-wrap:wrap;gap:10px}
+  .stat-strip{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:clamp(30px,6vw,46px)}
+  @media(max-width:560px){.stat-strip{grid-template-columns:1fr}}
+  .stat{background:var(--ink-2);border:1px solid var(--line);border-radius:14px;padding:16px 16px 14px}
+  .stat .n{font-family:"Bricolage Grotesque",sans-serif;font-weight:800;font-size:clamp(24px,4.5vw,32px);line-height:1}
+  .stat .n.b{color:var(--burn)} .stat .n.g{color:var(--gain)} .stat .n.y{color:var(--gold)}
+  .stat .l{font-size:12.5px;color:var(--haze);margin-top:6px;line-height:1.45}
+
+  /* ================= BUTTONS ================= */
+  .btn{display:inline-block;font-family:"Inter",sans-serif;font-weight:600;font-size:15px;border-radius:12px;cursor:pointer;
+    padding:12px 20px;border:1px solid var(--burn);background:var(--burn);color:#fff;text-decoration:none;
+    box-shadow:0 8px 22px -8px rgba(255,92,110,.7);transition:transform .12s ease,filter .15s ease}
+  .btn:hover{filter:brightness(1.07)} .btn:active{transform:translateY(1px)}
+  .btn:focus-visible{outline:3px solid rgba(201,189,238,.6);outline-offset:2px}
+  .btn.ghost{background:transparent;color:var(--mist);border-color:var(--line);box-shadow:none}
+  .btn.gain{background:var(--gain);border-color:var(--gain);color:var(--ink);box-shadow:0 8px 22px -8px rgba(67,224,192,.55)}
+  .btn.sm{padding:9px 14px;font-size:13.5px;border-radius:10px}
+
+  /* ================= SLIDERS ================= */
+  .ctrl + .ctrl{margin-top:24px}
+  .ctrl-head{display:flex;justify-content:space-between;align-items:baseline;gap:12px;margin-bottom:13px}
+  .ctrl-head label{font-weight:600;font-size:15px}
+  .readout{font-family:"Space Mono",monospace;font-weight:700;font-size:18px;color:var(--gold);white-space:nowrap}
+  input[type=range]{-webkit-appearance:none;appearance:none;width:100%;height:8px;border-radius:999px;
+    background:linear-gradient(90deg,var(--burn) 0%,var(--burn) var(--fill,40%),#3a2f63 var(--fill,40%),#3a2f63 100%);outline:none;cursor:pointer}
+  input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;appearance:none;width:26px;height:26px;border-radius:50%;
+    background:var(--paper);border:5px solid var(--burn);cursor:pointer;box-shadow:0 4px 14px rgba(255,92,110,.5)}
+  input[type=range]::-moz-range-thumb{width:26px;height:26px;border-radius:50%;background:var(--paper);
+    border:5px solid var(--burn);cursor:pointer;box-shadow:0 4px 14px rgba(255,92,110,.5)}
+  input[type=range]:focus-visible{box-shadow:0 0 0 3px rgba(201,189,238,.5)}
+  .scale{display:flex;justify-content:space-between;font-size:12px;color:var(--haze);margin-top:8px;font-family:"Space Mono",monospace}
+  input[type=range].teal{background:linear-gradient(90deg,var(--gain) 0%,var(--gain) var(--fill,40%),#3a2f63 var(--fill,40%),#3a2f63 100%)}
+  input[type=range].teal::-webkit-slider-thumb{border-color:var(--gain);box-shadow:0 4px 14px rgba(67,224,192,.45)}
+  input[type=range].teal::-moz-range-thumb{border-color:var(--gain);box-shadow:0 4px 14px rgba(67,224,192,.45)}
+
+  /* ================= GAP GAME ================= */
+  .dotgrid{display:grid;grid-template-columns:repeat(10,1fr);gap:clamp(5px,1.3vw,9px);margin:4px 0 22px}
+  .dot{aspect-ratio:1;border-radius:4px;background:var(--line);transition:background .25s ease,transform .25s ease}
+  .dot.guess{background:var(--burn)}
+  .dot.real{background:var(--gain);transform:scale(1.06)}
+  .gap-caption{margin-top:16px;color:var(--mist);font-size:15px;min-height:1.2em}
+  .gap-caption b{color:var(--paper)}
+  .gap-controls{display:flex;gap:10px;flex-wrap:wrap;margin-top:16px}
+
+  /* ================= COST ================= */
+  .horizon{display:flex;gap:8px;margin:26px 0 20px}
+  .horizon button{flex:1;font-weight:600;font-size:14px;color:var(--mist);background:var(--ink-2);
+    border:1px solid var(--line);padding:11px 6px;border-radius:12px;cursor:pointer;transition:all .15s ease;font-family:inherit}
+  .horizon button:hover{border-color:var(--haze)}
+  .horizon button[aria-pressed=true]{background:var(--burn);border-color:var(--burn);color:#fff;box-shadow:0 8px 22px -8px rgba(255,92,110,.7)}
+  .horizon button:focus-visible{outline:3px solid rgba(201,189,238,.6);outline-offset:2px}
+  .hero-cost{text-align:center;padding:4px 0 0}
+  .hero-label{font-family:"Space Mono",monospace;font-size:12px;letter-spacing:.18em;text-transform:uppercase;color:var(--haze)}
+  .big-number{font-family:"Bricolage Grotesque",sans-serif;font-weight:800;font-size:clamp(48px,14vw,104px);
+    line-height:.9;letter-spacing:-.03em;color:var(--burn);margin:6px 0 2px;text-shadow:0 0 40px rgba(255,92,110,.32);font-variant-numeric:tabular-nums}
+  .sub-line{color:var(--mist);font-size:15px}
+  .sub-line b{color:var(--paper);font-weight:600;font-family:"Space Mono",monospace}
+  .quit-flip{margin-top:18px;text-align:center;background:rgba(67,224,192,.08);border:1px solid rgba(67,224,192,.35);
+    border-radius:14px;padding:14px 16px;color:var(--mist);font-size:14.5px}
+  .quit-flip b{color:var(--gain);font-family:"Space Mono",monospace}
+  .trade-note{font-family:"Space Mono",monospace;font-size:13px;color:var(--haze);margin:24px 0 14px}
+  .grid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px}
+  @media(min-width:640px){.grid{grid-template-columns:repeat(3,1fr)}}
+  .card-item{background:linear-gradient(180deg,var(--ink-2),rgba(33,26,59,.4));border:1px solid var(--line);
+    border-radius:16px;padding:18px 16px;display:flex;flex-direction:column;gap:6px;min-height:116px;
+    transition:border-color .2s,opacity .35s,transform .35s cubic-bezier(.2,.8,.2,1)}
+  .card-item:hover{border-color:var(--gain)}
+  .card-item .emoji{font-size:25px;line-height:1}
+  .card-item .qty{font-family:"Bricolage Grotesque",sans-serif;font-weight:800;font-size:29px;color:var(--gain);line-height:1;font-variant-numeric:tabular-nums}
+  .card-item .item{font-size:14px;font-weight:500}
+  .card-item .price{font-size:12px;color:var(--haze);font-family:"Space Mono",monospace;margin-top:auto}
+  .card-item.enter{opacity:0;transform:translateY(10px) scale(.97)}
+
+  /* ================= MYTHS ================= */
+  .myths{display:grid;grid-template-columns:1fr;gap:14px}
+  @media(min-width:640px){.myths{grid-template-columns:1fr 1fr}}
+  .myth{text-align:left;width:100%;cursor:pointer;border-radius:18px;border:1px solid var(--line);
+    background:linear-gradient(180deg,var(--ink-2),rgba(33,26,59,.45));padding:22px 20px;color:var(--paper);
+    font-family:inherit;transition:border-color .2s,transform .12s ease}
+  .myth:hover{border-color:var(--haze)} .myth:active{transform:translateY(1px)}
+  .myth:focus-visible{outline:3px solid rgba(201,189,238,.55);outline-offset:2px}
+  .myth .tag{font-family:"Space Mono",monospace;font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:var(--burn-soft)}
+  .myth .claim{font-family:"Bricolage Grotesque",sans-serif;font-weight:700;font-size:19px;line-height:1.18;margin:6px 0 0;
+    display:flex;align-items:baseline;gap:8px;justify-content:space-between}
+  .myth .claim .quote{flex:1}
+  .myth .chev{font-family:"Space Mono",monospace;color:var(--haze);font-size:18px;transition:transform .25s ease;flex:none}
+  .myth[aria-expanded=true] .chev{transform:rotate(45deg)}
+  .myth .answer{max-height:0;overflow:hidden;transition:max-height .35s ease,margin .35s ease,opacity .3s ease;opacity:0;margin-top:0}
+  .myth[aria-expanded=true] .answer{max-height:520px;opacity:1;margin-top:14px}
+  .myth .answer .fact{color:var(--gain);font-family:"Space Mono",monospace;font-size:11px;letter-spacing:.12em;text-transform:uppercase}
+  .myth .answer p{margin:7px 0 0;color:var(--mist);font-size:14.5px;line-height:1.55}
+
+  /* ================= DASHBOARD ================= */
+  .dash-tabs{display:flex;gap:8px;flex-wrap:wrap;margin:26px 0 18px}
+  .dash-tabs button{font-family:"Space Mono",monospace;font-size:12.5px;letter-spacing:.02em;color:var(--mist);
+    background:var(--ink-2);border:1px solid var(--line);padding:10px 14px;border-radius:999px;cursor:pointer;transition:all .15s ease}
+  .dash-tabs button:hover{border-color:var(--haze)}
+  .dash-tabs button[aria-pressed=true]{background:var(--gold);border-color:var(--gold);color:var(--ink);font-weight:700}
+  .dash-tabs button:focus-visible{outline:3px solid rgba(201,189,238,.55);outline-offset:2px}
+  .dash-view{display:none}
+  .dash-view.active{display:block}
+  .chart-wrap{position:relative;height:340px;margin-top:6px}
+  @media(max-width:560px){.chart-wrap{height:290px}}
+  .dash-note{color:var(--mist);font-size:14.5px;line-height:1.6;margin:16px 0 0;max-width:64ch}
+  .dash-note b{color:var(--paper)}
+  .chart-src{font-family:"Space Mono",monospace;font-size:11px;color:var(--haze);margin-top:14px;line-height:1.6}
+  .dash-controls{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px}
+  .chip{font-family:"Inter",sans-serif;font-weight:600;font-size:13px;color:var(--mist);background:var(--ink-2);
+    border:1px solid var(--line);padding:8px 13px;border-radius:10px;cursor:pointer;transition:all .15s ease}
+  .chip:hover{border-color:var(--haze)}
+  .chip[aria-pressed=true]{background:var(--gain);border-color:var(--gain);color:var(--ink)}
+  .chip.warm[aria-pressed=true]{background:var(--burn);border-color:var(--burn);color:#fff}
+  .chip:focus-visible{outline:3px solid rgba(201,189,238,.55);outline-offset:2px}
+  .kpis{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:18px}
+  @media(max-width:620px){.kpis{grid-template-columns:1fr}}
+  .kpi{background:var(--ink-2);border:1px solid var(--line);border-radius:12px;padding:13px 14px}
+  .kpi .kn{font-family:"Bricolage Grotesque",sans-serif;font-weight:800;font-size:24px;line-height:1;font-variant-numeric:tabular-nums}
+  .kpi .kl{font-size:12px;color:var(--haze);margin-top:5px;line-height:1.4}
+
+  /* ================= POLICY ================= */
+  .timeline{margin-top:26px;position:relative;padding-left:26px}
+  .timeline::before{content:"";position:absolute;left:8px;top:6px;bottom:6px;width:2px;background:var(--line)}
+  .tl-item{position:relative;padding:0 0 26px 14px}
+  .tl-item:last-child{padding-bottom:0}
+  .tl-item::before{content:"";position:absolute;left:-24px;top:5px;width:14px;height:14px;border-radius:50%;
+    background:var(--ink);border:3px solid var(--gold)}
+  .tl-item.win::before{border-color:var(--gain)}
+  .tl-year{font-family:"Space Mono",monospace;font-size:12px;letter-spacing:.14em;color:var(--gold)}
+  .tl-item.win .tl-year{color:var(--gain)}
+  .tl-item h3{margin:4px 0 4px}
+  .tl-item p{margin:0;color:var(--mist);font-size:14.5px;line-height:1.6;max-width:62ch}
+  .policy-cta{margin-top:26px}
+
+  /* ================= SURVEY ================= */
+  .survey-shell{max-width:640px;margin:26px auto 0}
+  .progress{height:6px;background:var(--line);border-radius:999px;overflow:hidden;margin-bottom:22px}
+  .progress .fill{height:100%;width:0%;background:linear-gradient(90deg,var(--burn),var(--gold));border-radius:999px;transition:width .35s ease}
+  .q-step{display:none}
+  .q-step.active{display:block;animation:fadeUp .4s ease}
+  @keyframes fadeUp{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:none}}
+  .q-num{font-family:"Space Mono",monospace;font-size:12px;letter-spacing:.18em;text-transform:uppercase;color:var(--haze);margin-bottom:10px}
+  .q-text{font-family:"Bricolage Grotesque",sans-serif;font-weight:700;font-size:clamp(19px,3.4vw,24px);line-height:1.2;margin:0 0 8px}
+  .q-help{color:var(--haze);font-size:13.5px;margin:0 0 22px}
+  .choices{display:flex;flex-direction:column;gap:10px}
+  .choice{text-align:left;font-family:inherit;font-size:15px;font-weight:500;color:var(--paper);cursor:pointer;
+    background:var(--ink-2);border:1px solid var(--line);border-radius:12px;padding:14px 16px;transition:all .15s ease}
+  .choice:hover{border-color:var(--haze)}
+  .choice[aria-pressed=true]{border-color:var(--gain);background:rgba(67,224,192,.1)}
+  .choice:focus-visible{outline:3px solid rgba(201,189,238,.55);outline-offset:2px}
+  .q-nav{display:flex;justify-content:space-between;gap:10px;margin-top:26px}
+  .survey-note{font-size:12.5px;color:var(--haze);margin-top:18px;line-height:1.6}
+
+  /* results */
+  .res-card{border:1px solid var(--line);border-radius:16px;background:var(--ink-2);padding:18px;margin-top:14px}
+  .res-card .rq{font-size:13px;color:var(--haze);margin-bottom:12px}
+  .cmp{display:flex;flex-direction:column;gap:9px}
+  .cmp-row{display:grid;grid-template-columns:86px 1fr 64px;align-items:center;gap:10px;font-size:13px}
+  .cmp-row .who{font-family:"Space Mono",monospace;font-size:11px;letter-spacing:.06em;color:var(--haze);text-transform:uppercase}
+  .cmp-bar{height:14px;border-radius:999px;background:var(--line);overflow:hidden}
+  .cmp-bar i{display:block;height:100%;border-radius:999px;width:0%;transition:width .9s cubic-bezier(.2,.8,.2,1)}
+  .cmp-row.you i{background:var(--burn)} .cmp-row.real i{background:var(--gain)}
+  .cmp-row .val{font-family:"Space Mono",monospace;font-weight:700;font-size:13px;text-align:right}
+  .cmp-row.you .val{color:var(--burn-soft)} .cmp-row.real .val{color:var(--gain)}
+  .verdict{margin-top:10px;font-size:14px;color:var(--mist);line-height:1.55}
+  .verdict b{color:var(--paper)}
+  .score-hero{text-align:center;padding:10px 0 4px}
+  .score-hero .sc{font-family:"Bricolage Grotesque",sans-serif;font-weight:800;font-size:clamp(46px,11vw,80px);line-height:1;color:var(--gold)}
+  .score-hero .sl{font-family:"Space Mono",monospace;font-size:12px;letter-spacing:.18em;text-transform:uppercase;color:var(--haze);margin-top:6px}
+  .export-row{display:flex;gap:10px;flex-wrap:wrap;margin-top:22px;justify-content:center}
+  .saved-count{font-family:"Space Mono",monospace;font-size:12px;color:var(--haze);text-align:center;margin-top:14px}
+
+  /* ================= RESOURCES ================= */
+  .help-lead{background:linear-gradient(135deg,rgba(67,224,192,.14),rgba(33,26,59,.4));border:1px solid #2f6b5f;
+    border-radius:20px;padding:clamp(22px,4vw,30px);margin-bottom:18px}
+  .help-lead .big{font-family:"Bricolage Grotesque",sans-serif;font-weight:800;font-size:clamp(22px,4.5vw,30px);margin:8px 0 6px;line-height:1.1}
+  .help-lead .big b{color:var(--gain)}
+  .help-lead p{color:var(--mist);font-size:15px;margin:0 0 16px;max-width:52ch}
+  .help-actions{display:flex;flex-wrap:wrap;gap:10px}
+  .res-grid{display:grid;grid-template-columns:1fr;gap:12px}
+  @media(min-width:640px){.res-grid{grid-template-columns:1fr 1fr}}
+  .res{background:var(--ink-2);border:1px solid var(--line);border-radius:14px;padding:18px;display:flex;flex-direction:column;gap:5px}
+  .res .rn{font-weight:600;font-size:15px}
+  .res .rd{color:var(--mist);font-size:13.5px;line-height:1.5}
+  .res a{color:var(--gold);text-decoration:none;font-family:"Space Mono",monospace;font-size:13.5px;word-break:break-word}
+  .res a:hover{text-decoration:underline}
+  .res a:focus-visible{outline:2px solid var(--haze);outline-offset:2px}
+
+  /* ================= ABOUT / FOOT ================= */
+  .tracks{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:26px}
+  @media(max-width:640px){.tracks{grid-template-columns:1fr}}
+  .track{background:var(--ink-2);border:1px solid var(--line);border-radius:14px;padding:16px 17px}
+  .track .tt{font-family:"Space Mono",monospace;font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--gold);margin-bottom:6px}
+  .track p{margin:0;font-size:13.5px;color:var(--mist);line-height:1.55}
+  footer{max-width:var(--maxw);margin:0 auto;padding:40px clamp(16px,4vw,40px) 64px;border-top:1px solid var(--line);
+    color:var(--haze);font-size:13px;line-height:1.7}
+  footer b{color:var(--mist);font-weight:600}
+  footer .credit{font-family:"Space Mono",monospace;margin-bottom:14px;color:var(--mist);font-size:12px;letter-spacing:.04em}
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="nav-in">
+    <div class="brand">The Vaping <span>Illusion</span></div>
+    <div class="nav-links">
+      <a href="#gap">The gap</a>
+      <a href="#cost">The cost</a>
+      <a href="#myths">Myths</a>
+      <a href="#data">Dashboard</a>
+      <a href="#policy">Policy</a>
+      <a href="#help">Get help</a>
+      <a href="#survey" class="cta">Take the survey</a>
+    </div>
+  </div>
+</nav>
+
+<main>
+  <!-- ============ HERO ============ -->
+  <header class="hero">
+    <p class="eyebrow">KCS × NYU Langone Health · Youth Tobacco Prevention</p>
+    <h1>Vaping runs on things<br><span class="vapor">you can't quite see.</span></h1>
+    <p>How common it is. What it really costs. How hard it is to stop. On all three, most teens are quietly wrong — and that gap is exactly where vaping lives. This project makes it visible, with real data and a 2-minute survey you can take right now.</p>
+    <div class="hero-ctas">
+      <a class="btn" href="#survey">Test your perception →</a>
+      <a class="btn ghost" href="#data">Explore the data</a>
+    </div>
+    <div class="stat-strip">
+      <div class="stat"><div class="n b">1 in 17</div><div class="l">U.S. middle &amp; high schoolers who currently vape — far fewer than most people guess.</div></div>
+      <div class="stat"><div class="n y">$1,560</div><div class="l">What a modest habit ($15 vape, 2× a week) quietly costs in a single year.</div></div>
+      <div class="stat"><div class="n g">53%</div><div class="l">Of daily teen vapers who tried to quit and couldn't — up from 28% in 2020.</div></div>
+    </div>
+  </header>
+
+  <!-- ============ 01 GAP ============ -->
+  <section id="gap">
+    <div class="reveal">
+      <p class="eyebrow">Illusion 01 · How common</p>
+      <h2>You think it's <em class="b">everyone</em>.</h2>
+      <p class="sec-lede">Picture 100 students your age. How many do you think currently vape? Drag to lock in your guess, then reveal the real number.</p>
+    </div>
+    <div class="panel reveal mt">
+      <div class="dotgrid" id="dotgrid" aria-hidden="true"></div>
+      <div class="ctrl">
+        <div class="ctrl-head">
+          <label for="guess">Out of 100 students, how many vape?</label>
+          <span class="readout" id="guessOut">50</span>
+        </div>
+        <input type="range" id="guess" min="0" max="100" step="1" value="50">
+        <div class="scale"><span>0</span><span>100</span></div>
+      </div>
+      <p class="gap-caption" id="gapCaption">Make a guess, then hit reveal.</p>
+      <div class="gap-controls">
+        <button class="btn" id="revealBtn" type="button">Show the real number</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ 02 COST ============ -->
+  <section id="cost">
+    <div class="reveal">
+      <p class="eyebrow">Illusion 02 · What it costs</p>
+      <h2>You think it's <em class="b">cheap</em>.</h2>
+      <p class="sec-lede">It feels cheap because you pay a few dollars at a time. Set the sliders to real numbers and watch what it adds up to — and what that same money could have been instead.</p>
+    </div>
+    <div class="panel reveal mt">
+      <div class="ctrl">
+        <div class="ctrl-head"><label for="price">What does one vape cost?</label><span class="readout" id="priceOut">$15</span></div>
+        <input type="range" id="price" min="5" max="40" step="1" value="15">
+        <div class="scale"><span>$5</span><span>$40</span></div>
+      </div>
+      <div class="ctrl">
+        <div class="ctrl-head"><label for="freq">How many do you go through a week?</label><span class="readout" id="freqOut">2 a week</span></div>
+        <input type="range" id="freq" min="0.5" max="14" step="0.5" value="2">
+        <div class="scale"><span>½ a week</span><span>2 a day</span></div>
+      </div>
+      <div class="horizon" role="group" aria-label="Time horizon">
+        <button data-years="1" type="button">Over 1 year</button>
+        <button data-years="5" aria-pressed="true" type="button">Over 5 years</button>
+        <button data-years="10" type="button">Over 10 years</button>
+      </div>
+      <div class="hero-cost" aria-live="polite">
+        <div class="hero-label" id="heroLabel">What you'd spend in 5 years</div>
+        <div class="big-number" id="bigNumber">$0</div>
+        <div class="sub-line">That's <b id="perWeek">$0</b>/wk · <b id="perMonth">$0</b>/mo · <b id="perYear">$0</b>/yr</div>
+      </div>
+      <div class="quit-flip" id="quitFlip">Flip it: quit today and by this time next year you're holding <b>$1,560</b>.</div>
+      <p class="trade-note" id="tradeNote">The exact same money, instead spent on:</p>
+      <div class="grid" id="grid"></div>
+    </div>
+  </section>
+
+  <!-- ============ 03 MYTHS ============ -->
+  <section id="myths">
+    <div class="reveal">
+      <p class="eyebrow">Illusion 03 · What you've heard</p>
+      <h2>Six things that aren't <em class="g">true</em>.</h2>
+      <p class="sec-lede">Tap each one to flip it. These are the lines that keep people vaping — and what the research actually says.</p>
+    </div>
+    <div class="myths reveal mt" id="mythGrid"></div>
+  </section>
+
+  <!-- ============ 04 DASHBOARD ============ -->
+  <section id="data">
+    <div class="reveal">
+      <p class="eyebrow">Illusion 04 · The real numbers</p>
+      <h2>The data <em class="y">dashboard</em>.</h2>
+      <p class="sec-lede">Five views of what's actually happening — the fall in teen vaping, the deepening addiction among those who remain, the disparity hidden inside "Asian American" averages, what products hook teens, and what's rising next.</p>
+    </div>
+    <div class="panel reveal mt">
+      <div class="kpis">
+        <div class="kpi"><div class="kn" style="color:var(--gain)">5.9%</div><div class="kl">of U.S. students currently vape (2024) — down from over 27% of high schoolers in 2019</div></div>
+        <div class="kpi"><div class="kn" style="color:var(--burn)">~1.6M</div><div class="kl">students still currently use e-cigarettes nationwide</div></div>
+        <div class="kpi"><div class="kn" style="color:var(--gold)">87.6%</div><div class="kl">of youth vapers use flavored products — flavors are the on-ramp</div></div>
+      </div>
+
+      <div class="dash-tabs" role="tablist" aria-label="Dashboard views">
+        <button data-view="trend" aria-pressed="true" type="button">① The fall</button>
+        <button data-view="hard" aria-pressed="false" type="button">② The hardening</button>
+        <button data-view="disagg" aria-pressed="false" type="button">③ The hidden disparity</button>
+        <button data-view="product" aria-pressed="false" type="button">④ What hooks teens</button>
+        <button data-view="next" aria-pressed="false" type="button">⑤ What's next</button>
+      </div>
+
+      <!-- view 1: trend -->
+      <div class="dash-view active" id="view-trend">
+        <div class="dash-controls">
+          <button class="chip" data-series="hs" aria-pressed="true" type="button">High school</button>
+          <button class="chip" data-series="ms" aria-pressed="true" type="button">Middle school</button>
+        </div>
+        <div class="chart-wrap"><canvas id="chartTrend" role="img" aria-label="Line chart of current e-cigarette use among U.S. high school and middle school students, 2019 to 2024, showing a steep decline"></canvas></div>
+        <p class="dash-note"><b>The headline:</b> current e-cigarette use among high schoolers collapsed from <b>27.5%</b> in 2019 to <b>7.8%</b> in 2024 — real progress, driven partly by policy (flavor restrictions, Tobacco 21) and changing norms. But progress at the population level hides what's happening to the teens still vaping. Click view ② .</p>
+        <p class="chart-src">Source: National Youth Tobacco Survey (CDC/FDA), 2019–2024. "Current use" = past 30 days.</p>
+      </div>
+
+      <!-- view 2: hardening -->
+      <div class="dash-view" id="view-hard">
+        <div class="chart-wrap"><canvas id="chartHard" role="img" aria-label="Grouped bar chart showing daily vaping among youth vapers rising from 15 to 29 percent and failed quit attempts among daily users rising from 28 to 53 percent, 2020 versus 2024"></canvas></div>
+        <p class="dash-note"><b>The twist:</b> fewer teens vape, but those who do are far more addicted. Daily use among youth vapers nearly <b>doubled</b> (15% → 29%), and among daily users, the share who tried to quit but couldn't rose from <b>28% to 53%</b>. Prevention now has two jobs: keep teens from starting, and take "I can stop whenever" off the table.</p>
+        <p class="chart-src">Source: Monitoring the Future analysis published in JAMA Network Open, U.S. secondary students, 2020–2024.</p>
+      </div>
+
+      <!-- view 3: disaggregation -->
+      <div class="dash-view" id="view-disagg">
+        <div class="dash-controls">
+          <button class="chip warm" id="disaggBtn" aria-pressed="false" type="button">Disaggregate the data →</button>
+        </div>
+        <div class="chart-wrap"><canvas id="chartDisagg" role="img" aria-label="Bar chart that starts with one bar showing the aggregate Asian American adult smoking rate and expands to show much higher reported rates among Korean American men"></canvas></div>
+        <p class="dash-note" id="disaggNote"><b>On paper, Asian Americans smoke the least of any group.</b> One number, one story. Press the button to see what that average is hiding.</p>
+        <p class="chart-src">Sources: aggregate rate from national adult surveys (CDC); Korean American subgroup rates from community and state studies (e.g., California Health Interview Survey era research) — reported ranges, shown here to illustrate masking. Exact figures vary by study, year, and region; that variation is itself part of the problem.</p>
+      </div>
+
+      <!-- view 4: products -->
+      <div class="dash-view" id="view-product">
+        <div class="chart-wrap"><canvas id="chartProduct" role="img" aria-label="Doughnut chart showing 87.6 percent of youth e-cigarette users use flavored products"></canvas></div>
+        <p class="dash-note"><b>Flavors are the on-ramp, disposables are the vehicle.</b> Nearly 9 in 10 teen vapers use flavored products — fruit, candy, mint — and a majority reach for cheap disposables built for continuous use. This is why flavor policy (view ⑤ of the timeline below) sits at the center of youth prevention.</p>
+        <p class="chart-src">Source: National Youth Tobacco Survey (CDC/FDA), 2024 — flavored product use among current youth e-cigarette users.</p>
+      </div>
+
+      <!-- view 5: next wave -->
+      <div class="dash-view" id="view-next">
+        <div class="chart-wrap"><canvas id="chartNext" role="img" aria-label="Bar chart showing nicotine pouch use among 12th graders rising from 1.4 percent in 2023 to 4.4 percent in 2025"></canvas></div>
+        <p class="dash-note"><b>Prevention is a moving target.</b> As vaping falls, nicotine pouches (like Zyn) are climbing among older teens — use among 12th graders roughly <b>tripled</b> in two years. Any campaign built only around "vaping" will age fast; ours is built around nicotine and the illusions that sell it, whatever the package.</p>
+        <p class="chart-src">Source: Monitoring the Future, University of Michigan — past-12-month nicotine pouch use, 12th grade, 2023–2025.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ 05 POLICY ============ -->
+  <section id="policy">
+    <div class="reveal">
+      <p class="eyebrow">Illusion 05 · "Nothing can be done"</p>
+      <h2>Policy <em class="g">works</em>. Here's the NYC record.</h2>
+      <p class="sec-lede">The fall in teen vaping didn't just happen — New York built some of the strongest youth tobacco policy in the country, and the data above moved with it. A short timeline, and where it goes next.</p>
+    </div>
+    <div class="timeline reveal">
+      <div class="tl-item win">
+        <div class="tl-year">2014</div>
+        <h3>NYC raises the tobacco age to 21</h3>
+        <p>New York City becomes one of the first major U.S. cities with "Tobacco 21," years ahead of the federal law — cutting off the social supply chain where 16-year-olds got products from 18-year-old classmates.</p>
+      </div>
+      <div class="tl-item win">
+        <div class="tl-year">2018</div>
+        <h3>Retail density caps &amp; price floors</h3>
+        <p>NYC caps tobacco retail licenses to shrink the number of sellers over time, sets minimum prices, and requires e-cigarette retailers to hold licenses — making nicotine harder to stumble into on every corner.</p>
+      </div>
+      <div class="tl-item win">
+        <div class="tl-year">2019</div>
+        <h3>Pharmacies stop selling tobacco · Federal Tobacco 21</h3>
+        <p>Tobacco disappears from NYC drugstores, and the federal minimum age rises to 21 nationwide — following the path NYC helped open.</p>
+      </div>
+      <div class="tl-item win">
+        <div class="tl-year">2020</div>
+        <h3>New York bans flavored vapes</h3>
+        <p>New York State prohibits the sale of flavored e-cigarettes — targeting the single biggest on-ramp for youth use (see dashboard view ④). NYC pairs it with restrictions on other flavored tobacco products.</p>
+      </div>
+      <div class="tl-item">
+        <div class="tl-year">Now</div>
+        <h3>The unfinished part</h3>
+        <p>Enforcement against illegal flavored disposables (many imported and unauthorized), the rise of nicotine pouches, and online sales are the live battlegrounds. This is where our project's policy recommendations will land — informed by our own survey data on how teens actually encounter these products.</p>
+      </div>
+    </div>
+    <div class="policy-cta reveal">
+      <a class="btn ghost" href="#survey">Your survey answers feed this research →</a>
+    </div>
+  </section>
+
+  <!-- ============ 06 SURVEY ============ -->
+  <section id="survey">
+    <div class="reveal">
+      <p class="eyebrow">The experiment · 2 minutes · Anonymous</p>
+      <h2>Now <em class="y">you're</em> the data point.</h2>
+      <p class="sec-lede">Seven quick questions about what you <em>think</em> is true. At the end you'll see your answers against the real numbers — and get your personal Illusion Score. No names, no accounts, nothing leaves your device unless you choose to share it.</p>
+    </div>
+    <div class="panel reveal survey-shell" id="surveyPanel">
+      <div class="progress" aria-hidden="true"><div class="fill" id="progFill"></div></div>
+      <div id="surveySteps"></div>
+      <p class="survey-note">This survey is part of a student research project for the KCS × NYU Langone Youth Tobacco Prevention Program. Responses are anonymous. Your results stay on this device; the "download" button at the end lets you send them to our team if you want to contribute.</p>
+    </div>
+  </section>
+
+  <!-- ============ 07 HELP ============ -->
+  <section id="help">
+    <div class="reveal">
+      <p class="eyebrow">No judgment · Free · Anonymous</p>
+      <h2>If you want to stop, here's real <em class="g">help</em>.</h2>
+    </div>
+    <div class="reveal mt">
+      <div class="help-lead">
+        <p class="eyebrow" style="margin-bottom:0">Start here</p>
+        <div class="big">Text <b>DITCHVAPE</b> to <b>88709</b></div>
+        <p>"This is Quitting" from Truth Initiative — a free, anonymous text program built by and for teens and young adults. Real support, on your phone, any hour.</p>
+        <div class="help-actions">
+          <a href="sms:88709?body=DITCHVAPE" class="btn">Text DITCHVAPE to 88709</a>
+          <a href="tel:1-800-784-8669" class="btn ghost">Call 1-800-QUIT-NOW</a>
+        </div>
+      </div>
+      <div class="res-grid">
+        <div class="res">
+          <div class="rn">SmokefreeTXT for Teens</div>
+          <div class="rd">Daily texts with tips and encouragement. Text <b>QUIT to 47848</b>.</div>
+          <a href="https://teen.smokefree.gov" target="_blank" rel="noopener">teen.smokefree.gov</a>
+        </div>
+        <div class="res">
+          <div class="rn">New York State Quitline</div>
+          <div class="rd">Free coaching and nicotine replacement (limited time). Call <b>1-866-NY-QUITS</b> (1-866-697-8487), or dial <b>311</b> in NYC.</div>
+          <a href="https://nysmokefree.com" target="_blank" rel="noopener">nysmokefree.com</a>
+        </div>
+        <div class="res">
+          <div class="rn">CDC Quitline</div>
+          <div class="rd">Routes you to your state's free quit program. Call <b>1-800-QUIT-NOW</b> (1-800-784-8669).</div>
+          <a href="https://smokefree.gov" target="_blank" rel="noopener">smokefree.gov</a>
+        </div>
+        <div class="res">
+          <div class="rn">quitSTART app (CDC)</div>
+          <div class="rd">Track cravings, set quit-date reminders, and earn milestones. Free on iOS and Android.</div>
+          <a href="https://smokefree.gov/tools-tips/apps/quitstart" target="_blank" rel="noopener">smokefree.gov/quitstart</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ 08 ABOUT ============ -->
+  <section id="about">
+    <div class="reveal">
+      <p class="eyebrow">About this project</p>
+      <h2>One thesis, six <em class="y">tracks</em>.</h2>
+      <p class="sec-lede">Everything on this site is one argument — vaping is sold on illusions, and making them visible is prevention — built to cover every track of the KCS × NYU Langone program.</p>
+    </div>
+    <div class="tracks reveal">
+      <div class="track"><div class="tt">Student-led website</div><p>This site: a hand-built interactive platform, no templates, hosting all project work.</p></div>
+      <div class="track"><div class="tt">Research &amp; academic</div><p>The perception-gap survey above generates our original data; the dashboard synthesizes NYTS, MTF, and community studies for our evidence-based paper.</p></div>
+      <div class="track"><div class="tt">Digital media campaign</div><p>Every section is a shareable asset: "1 in 17," the cost calculator, and myth cards become the peer-to-peer social campaign.</p></div>
+      <div class="track"><div class="tt">Creative communication</div><p>Complex health data translated into interactive visuals — dot grids, growing charts, flip cards — instead of lectures.</p></div>
+      <div class="track"><div class="tt">Expert engagement</div><p>Survey design and the disaggregation analysis are reviewed with NYU Langone population-health mentors before deployment.</p></div>
+      <div class="track"><div class="tt">Policy &amp; advocacy (NYC)</div><p>The policy timeline tracks NYC/NYS law; our recommendations will target enforcement gaps our survey uncovers.</p></div>
+    </div>
+  </section>
+</main>
+
+<footer>
+  <p class="credit">THE VAPING ILLUSION — a student project for the KCS × NYU Langone Health Youth Tobacco Prevention Program.</p>
+  <p><b>Sources:</b> National Youth Tobacco Survey (CDC/FDA), 2019–2024 — current (past-30-day) use among U.S. middle &amp; high school students; Monitoring the Future / JAMA Network Open (2020–2024) — daily use and quit attempts among youth who vape; Monitoring the Future (2023–2025) — nicotine pouch use, 12th grade; CDC — youth e-cigarette resources; Truth Initiative — This is Quitting; community and state studies on Korean American adult smoking (reported ranges; figures vary by study, year, and region). The cost tool estimates from your inputs at today's prices, excluding tax and price increases. This site is for education and awareness, not medical advice. Survey responses are anonymous and stored only on your device unless you choose to download and share them.</p>
+</footer>
+
+<script>
+(function(){
+  "use strict";
+  var reduceMotion = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var fmt0 = new Intl.NumberFormat('en-US',{style:'currency',currency:'USD',maximumFractionDigits:0});
+  function setFill(el){var min=+el.min,max=+el.max,v=+el.value;el.style.setProperty('--fill',((v-min)/(max-min)*100)+'%');}
+  function $(id){return document.getElementById(id);}
+
+  /* ===== scroll reveal ===== */
+  var revealEls=document.querySelectorAll('.reveal');
+  if(reduceMotion||!('IntersectionObserver' in window)){revealEls.forEach(function(e){e.classList.add('in');});}
+  else{
+    var io=new IntersectionObserver(function(entries){entries.forEach(function(en){
+      if(en.isIntersecting){en.target.classList.add('in');io.unobserve(en.target);}});},{threshold:.1});
+    revealEls.forEach(function(e){io.observe(e);});
+  }
+
+  /* ================= 01 GAP GAME ================= */
+  var REAL_PREV = 6; // ~5.9% NYTS 2024, rounded for the 100-dot grid
+  (function(){
+    var grid=$('dotgrid'),guessEl=$('guess'),guessOut=$('guessOut'),caption=$('gapCaption'),btn=$('revealBtn');
+    var revealed=false,dots=[];
+    for(var i=0;i<100;i++){var d=document.createElement('div');d.className='dot';grid.appendChild(d);dots.push(d);}
+    function paintGuess(){
+      var n=+guessEl.value;guessOut.textContent=n;setFill(guessEl);
+      for(var i=0;i<100;i++){dots[i].classList.toggle('guess',i<n);dots[i].classList.remove('real');}
+    }
+    function reveal(){
+      revealed=true;var guessed=+guessEl.value;
+      for(var i=0;i<100;i++){dots[i].classList.remove('guess');dots[i].classList.remove('real');}
+      var delay=reduceMotion?0:70;
+      for(var j=0;j<REAL_PREV;j++){(function(idx){setTimeout(function(){dots[idx].classList.add('real');},idx*delay);})(j);}
+      var diff=guessed-REAL_PREV;
+      var line = diff>0
+        ? 'You guessed <b>'+guessed+' in 100</b> — <b>'+diff+' too high</b>. The real number is about <b>6 in 100</b> (1 in 17). When it feels like "everyone\u2019s doing it," that feeling is the illusion.'
+        : (diff===0
+          ? 'You guessed <b>exactly right</b> — about <b>6 in 100</b>. Most people guess far higher; you\u2019re seeing through the illusion already.'
+          : 'You guessed <b>'+guessed+' in 100</b> — even <b>under</b> the real ~<b>6 in 100</b>. Rare! Most people overshoot wildly.');
+      caption.innerHTML=line;
+      guessEl.disabled=true;btn.textContent='Guess again';
+    }
+    function resetGuess(){revealed=false;guessEl.disabled=false;btn.textContent='Show the real number';
+      caption.textContent='Make a guess, then hit reveal.';paintGuess();}
+    guessEl.addEventListener('input',function(){if(!revealed)paintGuess();});
+    btn.addEventListener('click',function(){revealed?resetGuess():reveal();});
+    paintGuess();
+  })();
+
+  /* ================= 02 COST ================= */
+  (function(){
+    var priceEl=$('price'),freqEl=$('freq'),priceOut=$('priceOut'),freqOut=$('freqOut');
+    var bigEl=$('bigNumber'),heroLabel=$('heroLabel'),perWeek=$('perWeek'),perMonth=$('perMonth'),perYear=$('perYear');
+    var grid=$('grid'),tradeNote=$('tradeNote'),quitFlip=$('quitFlip');
+    var horizonBtns=[].slice.call(document.querySelectorAll('#cost .horizon button'));
+    var years=5,prevTotal=0;
+    var ITEMS=[
+      {name:'round trips to Seoul',price:1300,emoji:'✈️'},
+      {name:'used-car down payments',price:2500,emoji:'🚗'},
+      {name:'PlayStation 5 consoles',price:500,emoji:'🎮'},
+      {name:'concert tickets',price:200,emoji:'🎫'},
+      {name:'pairs of AirPods Pro',price:250,emoji:'🎧'},
+      {name:'years of Spotify Premium',price:120,emoji:'🎵'},
+      {name:'movie nights out',price:18,emoji:'🍿'},
+      {name:'boba teas',price:7,emoji:'🧋'}
+    ];
+    function freqLabel(v){
+      if(v<1)return '\u00BD a week';
+      if(v<7)return v+' a week';
+      var pd=v/7;
+      if(Math.abs(pd-Math.round(pd))<0.05)return Math.round(pd)+' a day';
+      return (Math.round(pd*10)/10)+' a day';
+    }
+    function animateNumber(to){
+      if(reduceMotion){bigEl.textContent=fmt0.format(to);prevTotal=to;return;}
+      var from=prevTotal,start=null,dur=600;
+      function step(ts){if(start===null)start=ts;var t=Math.min((ts-start)/dur,1);var e=1-Math.pow(1-t,3);
+        bigEl.textContent=fmt0.format(from+(to-from)*e);
+        if(t<1)requestAnimationFrame(step);else bigEl.textContent=fmt0.format(to);}
+      requestAnimationFrame(step);prevTotal=to;
+    }
+    function renderGrid(total,withEntry){
+      grid.innerHTML='';var shown=0;
+      for(var i=0;i<ITEMS.length&&shown<6;i++){
+        var it=ITEMS[i],qty=Math.floor(total/it.price);
+        if(qty<1)continue;
+        var c=document.createElement('div');
+        c.className='card-item'+(withEntry?' enter':'');
+        c.innerHTML='<div class="emoji">'+it.emoji+'</div><div class="qty">'+qty.toLocaleString('en-US')+
+          '</div><div class="item">'+it.name+'</div><div class="price">'+fmt0.format(it.price)+' each</div>';
+        grid.appendChild(c);
+        if(withEntry){(function(card,idx){requestAnimationFrame(function(){setTimeout(function(){card.classList.remove('enter');},idx*55+20);});})(c,shown);}
+        shown++;
+      }
+      tradeNote.textContent=shown===0?'Bump the sliders up to see what it trades away.':'The exact same money, instead spent on:';
+    }
+    function update(revealAnim){
+      var price=+priceEl.value,freq=+freqEl.value;
+      priceOut.textContent=fmt0.format(price);freqOut.textContent=freqLabel(freq);
+      setFill(priceEl);setFill(freqEl);
+      var weekly=price*freq,annual=weekly*52,monthly=annual/12,total=annual*years;
+      heroLabel.textContent='What you\u2019d spend in '+years+(years===1?' year':' years');
+      perWeek.textContent=fmt0.format(weekly);perMonth.textContent=fmt0.format(monthly);perYear.textContent=fmt0.format(annual);
+      quitFlip.innerHTML='Flip it: quit today and by this time next year you\u2019re holding <b>'+fmt0.format(annual)+'</b>.';
+      var doAnim=revealAnim&&!reduceMotion;
+      if(doAnim)animateNumber(total);else{bigEl.textContent=fmt0.format(total);prevTotal=total;}
+      renderGrid(total,doAnim);
+    }
+    horizonBtns.forEach(function(btn){btn.addEventListener('click',function(){
+      years=parseInt(btn.getAttribute('data-years'),10);
+      horizonBtns.forEach(function(b){b.setAttribute('aria-pressed',b===btn?'true':'false');});
+      update(true);
+    });});
+    priceEl.addEventListener('input',function(){update(false);});
+    freqEl.addEventListener('input',function(){update(false);});
+    update(false);
+  })();
+
+  /* ================= 03 MYTHS ================= */
+  (function(){
+    var MYTHS=[
+      {claim:'It\u2019s just water vapor.',fact:'It\u2019s an aerosol — not water.',
+       body:'Vape clouds carry nicotine and other chemicals deep into the lungs. Nicotine is highly addictive and can harm the developing brain — the systems running attention, learning, mood, and impulse control — through about age 25.'},
+      {claim:'I can quit whenever I want.',fact:'Most daily users can\u2019t.',
+       body:'Daily vaping among teen users nearly doubled from 2020 to 2024, and over half of daily users who tried to quit couldn\u2019t. "I\u2019ll stop whenever" is what addiction feels like before you test it.'},
+      {claim:'Everyone\u2019s doing it.',fact:'About 6 in 100 are.',
+       body:'Only ~6% of U.S. middle and high schoolers currently vape — 1 in 17. People wildly overestimate it, and that false "normal" is one of the strongest pulls toward starting. (You just tested this on yourself above.)'},
+      {claim:'It\u2019s cheap, so it\u2019s no big deal.',fact:'It runs into the thousands.',
+       body:'A steady habit costs thousands over a few years — the calculator above does the math on your own numbers. And it\u2019s engineered to persist: most teen vapers use flavored disposables designed for continuous use.'},
+      {claim:'It helps with stress.',fact:'It manufactures the stress it relieves.',
+       body:'Nicotine relief is mostly relief from nicotine withdrawal — a loop that ramps anxiety between uses. Quitting is linked with <em>lower</em> anxiety, depression, and stress over time, not higher.'},
+      {claim:'Asian kids don\u2019t really smoke or vape.',fact:'The average hides the risk.',
+       body:'Aggregate stats show Asian Americans with the lowest smoking rates — but community studies have found Korean American men smoking at several times that rate. Averages can erase exactly the communities that need support. See dashboard view ③.'}
+    ];
+    var wrap=$('mythGrid');
+    MYTHS.forEach(function(m,i){
+      var b=document.createElement('button');
+      b.className='myth';b.setAttribute('aria-expanded','false');b.type='button';
+      b.innerHTML='<div class="tag">Myth 0'+(i+1)+'</div>'+
+        '<div class="claim"><span class="quote">\u201C'+m.claim+'\u201D</span><span class="chev">+</span></div>'+
+        '<div class="answer"><div class="fact">'+m.fact+'</div><p>'+m.body+'</p></div>';
+      b.addEventListener('click',function(){
+        b.setAttribute('aria-expanded',b.getAttribute('aria-expanded')==='true'?'false':'true');
+      });
+      wrap.appendChild(b);
+    });
+  })();
+
+  /* ================= 04 DASHBOARD (Chart.js) ================= */
+  (function(){
+    if(typeof Chart==='undefined'){
+      var dv=document.querySelectorAll('#data .chart-wrap');
+      dv.forEach(function(w){w.innerHTML='<p style="color:var(--mist);font-size:14px;padding:20px">Charts couldn\u2019t load (no internet connection to the chart library). The written takeaways below each view still tell the story.</p>';});
+      // tabs still switch views
+    }
+    var css=getComputedStyle(document.documentElement);
+    var C={burn:css.getPropertyValue('--burn').trim(),gain:css.getPropertyValue('--gain').trim(),
+      gold:css.getPropertyValue('--gold').trim(),haze:css.getPropertyValue('--haze').trim(),
+      mist:css.getPropertyValue('--mist').trim(),line:css.getPropertyValue('--line').trim(),paper:css.getPropertyValue('--paper').trim()};
+    if(typeof Chart!=='undefined'){
+      Chart.defaults.color=C.mist;
+      Chart.defaults.borderColor='rgba(58,47,99,.6)';
+      Chart.defaults.font.family='"Inter",system-ui,sans-serif';
+      Chart.defaults.font.size=12.5;
+      Chart.defaults.plugins.legend.labels.boxWidth=14;
+      Chart.defaults.plugins.legend.labels.boxHeight=14;
+      Chart.defaults.animation.duration=reduceMotion?0:900;
+    }
+    var built={};
+    var charts={};
+
+    function buildTrend(){
+      var hsData=[27.5,19.6,11.3,14.1,10.0,7.8], msData=[10.5,4.7,2.8,3.3,4.6,3.5];
+      charts.trend=new Chart($('chartTrend'),{
+        type:'line',
+        data:{labels:['2019','2020','2021','2022','2023','2024'],
+          datasets:[
+            {label:'High school',data:hsData,borderColor:C.burn,backgroundColor:'rgba(255,92,110,.15)',
+             borderWidth:3,pointRadius:4,pointBackgroundColor:C.burn,tension:.3,fill:true},
+            {label:'Middle school',data:msData,borderColor:C.gain,backgroundColor:'rgba(67,224,192,.10)',
+             borderWidth:3,pointRadius:4,pointBackgroundColor:C.gain,tension:.3,fill:true}
+          ]},
+        options:{responsive:true,maintainAspectRatio:false,interaction:{mode:'index',intersect:false},
+          plugins:{tooltip:{callbacks:{label:function(ctx){return ' '+ctx.dataset.label+': '+ctx.parsed.y+'% currently vape';}}}},
+          scales:{y:{beginAtZero:true,max:30,ticks:{callback:function(v){return v+'%';}},title:{display:true,text:'Current e-cigarette use'}},
+                  x:{grid:{display:false}}}}
+      });
+      document.querySelectorAll('#view-trend .chip').forEach(function(chip){
+        chip.addEventListener('click',function(){
+          var on=chip.getAttribute('aria-pressed')!=='true';
+          chip.setAttribute('aria-pressed',on?'true':'false');
+          var idx=chip.getAttribute('data-series')==='hs'?0:1;
+          charts.trend.setDatasetVisibility(idx,on);
+          charts.trend.update();
+        });
+      });
+    }
+
+    function buildHard(){
+      charts.hard=new Chart($('chartHard'),{
+        type:'bar',
+        data:{labels:['Vape every day\n(share of youth vapers)','Tried to quit, couldn\u2019t\n(share of daily users)'],
+          datasets:[
+            {label:'2020',data:[15,28],backgroundColor:'rgba(138,125,184,.85)',borderRadius:8,maxBarThickness:64},
+            {label:'2024',data:[29,53],backgroundColor:C.burn,borderRadius:8,maxBarThickness:64}
+          ]},
+        options:{responsive:true,maintainAspectRatio:false,
+          plugins:{tooltip:{callbacks:{label:function(ctx){return ' '+ctx.dataset.label+': '+ctx.parsed.y+'%';}}}},
+          scales:{y:{beginAtZero:true,max:60,ticks:{callback:function(v){return v+'%';}}},
+                  x:{grid:{display:false},ticks:{callback:function(v){
+                    var l=this.getLabelForValue(v).split('\n');return l;}}}}}
+      });
+    }
+
+    function buildDisagg(){
+      charts.disagg=new Chart($('chartDisagg'),{
+        type:'bar',
+        data:{labels:['Asian American (aggregate)'],
+          datasets:[{label:'Adult smoking rate',data:[10.7],
+            backgroundColor:[C.haze],borderRadius:8,maxBarThickness:110}]},
+        options:{responsive:true,maintainAspectRatio:false,
+          plugins:{legend:{display:false},
+            tooltip:{callbacks:{label:function(ctx){return ' '+ctx.parsed.y+'% (reported rate)';}}}},
+          scales:{y:{beginAtZero:true,max:40,ticks:{callback:function(v){return v+'%';}},
+                     title:{display:true,text:'Adult smoking prevalence'}},
+                  x:{grid:{display:false}}}}
+      });
+      var btn=$('disaggBtn'),note=$('disaggNote'),open=false;
+      btn.addEventListener('click',function(){
+        open=!open;
+        btn.setAttribute('aria-pressed',open?'true':'false');
+        if(open){
+          btn.textContent='← Re-aggregate';
+          charts.disagg.data.labels=['Asian American (aggregate)','Korean American men (reported, up to)','Korean American women (reported)'];
+          charts.disagg.data.datasets[0].data=[10.7,36.7,17.0];
+          charts.disagg.data.datasets[0].backgroundColor=[C.haze,C.burn,C.gold];
+          note.innerHTML='<b>The average was hiding a 3× risk.</b> Community studies have reported Korean American men smoking at up to <b>36.7%</b> — several times the aggregate "Asian American" rate that makes the community look low-risk. This is why our project argues for <b>disaggregated data</b>: you can\u2019t serve a community you\u2019ve statistically erased.';
+        }else{
+          btn.textContent='Disaggregate the data →';
+          charts.disagg.data.labels=['Asian American (aggregate)'];
+          charts.disagg.data.datasets[0].data=[10.7];
+          charts.disagg.data.datasets[0].backgroundColor=[C.haze];
+          note.innerHTML='<b>On paper, Asian Americans smoke the least of any group.</b> One number, one story. Press the button to see what that average is hiding.';
+        }
+        charts.disagg.update();
+      });
+    }
+
+    function buildProduct(){
+      charts.product=new Chart($('chartProduct'),{
+        type:'doughnut',
+        data:{labels:['Flavored (fruit, candy, mint…)','Unflavored / tobacco flavor'],
+          datasets:[{data:[87.6,12.4],backgroundColor:[C.burn,'rgba(58,47,99,.9)'],borderWidth:0,hoverOffset:8}]},
+        options:{responsive:true,maintainAspectRatio:false,cutout:'62%',
+          plugins:{tooltip:{callbacks:{label:function(ctx){return ' '+ctx.label+': '+ctx.parsed+'% of teen vapers';}}},
+            legend:{position:'bottom'}}}
+      });
+    }
+
+    function buildNext(){
+      charts.next=new Chart($('chartNext'),{
+        type:'bar',
+        data:{labels:['2023','2024','2025'],
+          datasets:[{label:'12th graders using nicotine pouches (past 12 mo)',
+            data:[1.4,2.5,4.4],backgroundColor:[ 'rgba(138,125,184,.85)','rgba(255,200,97,.85)',C.burn],
+            borderRadius:8,maxBarThickness:80}]},
+        options:{responsive:true,maintainAspectRatio:false,
+          plugins:{legend:{display:false},
+            tooltip:{callbacks:{label:function(ctx){return ' '+ctx.parsed.y+'% of 12th graders';}}}},
+          scales:{y:{beginAtZero:true,max:6,ticks:{callback:function(v){return v+'%';}}},
+                  x:{grid:{display:false}}}}
+      });
+    }
+
+    var builders={trend:buildTrend,hard:buildHard,disagg:buildDisagg,product:buildProduct,next:buildNext};
+    function ensureBuilt(view){
+      if(built[view]||typeof Chart==='undefined')return;
+      built[view]=true;builders[view]();
+    }
+
+    // tab switching
+    var tabs=[].slice.call(document.querySelectorAll('.dash-tabs button'));
+    var views={trend:$('view-trend'),hard:$('view-hard'),disagg:$('view-disagg'),product:$('view-product'),next:$('view-next')};
+    tabs.forEach(function(tab){
+      tab.addEventListener('click',function(){
+        var v=tab.getAttribute('data-view');
+        tabs.forEach(function(t){t.setAttribute('aria-pressed',t===tab?'true':'false');});
+        Object.keys(views).forEach(function(k){views[k].classList.toggle('active',k===v);});
+        ensureBuilt(v);
+      });
+    });
+
+    // build the first chart when the dashboard scrolls into view
+    if(reduceMotion||!('IntersectionObserver' in window)){ensureBuilt('trend');}
+    else{
+      var dio=new IntersectionObserver(function(en){en.forEach(function(e){
+        if(e.isIntersecting){ensureBuilt('trend');dio.disconnect();}});},{threshold:.2});
+      dio.observe($('data'));
+    }
+  })();
+
+  /* ================= 06 SURVEY ================= */
+  (function(){
+    /* ── TEAM CONFIG ──────────────────────────────────────────────
+       Paste your Google Apps Script web-app URL between the quotes
+       to send every survey response to your live Google Sheet.
+       Leave it empty ("") and the survey still works fully —
+       responses just stay on-device with the download button.    */
+    var SHEET_ENDPOINT = "";
+    /* ─────────────────────────────────────────────────────────── */
+    var QUESTIONS=[
+      {id:'prevalence',type:'slider',min:0,max:100,start:50,unit:' in 100',
+       q:'Out of 100 students your age, how many do you think currently vape?',
+       help:'"Currently" means at least once in the past 30 days.',
+       real:6,realLabel:'6 in 100',fmt:function(v){return v+' in 100';}},
+      {id:'cost',type:'slider',min:0,max:5000,step:50,start:500,unit:'$',
+       q:'What do you think a typical vaping habit costs per YEAR?',
+       help:'Think: one $15 disposable, about twice a week.',
+       real:1560,realLabel:'$1,560',fmt:function(v){return fmt0.format(v);}},
+      {id:'quit',type:'slider',min:0,max:100,start:50,unit:'%',
+       q:'Of teens who vape daily and try to quit, what % do you think succeed?',
+       help:'Your honest guess — most people have never seen this number.',
+       real:47,realLabel:'~47% (53% couldn\u2019t)',fmt:function(v){return v+'%';}},
+      {id:'flavored',type:'slider',min:0,max:100,start:50,unit:'%',
+       q:'What % of teen vapers do you think use flavored products?',
+       help:'Fruit, candy, mint, dessert flavors — versus plain tobacco flavor.',
+       real:88,realLabel:'87.6%',fmt:function(v){return v+'%';}},
+      {id:'harm',type:'choice',
+       q:'Compared to 5 years ago, do you think teen vaping overall has…',
+       choices:['Gone way up','Gone up a little','Stayed the same','Gone down'],
+       correct:3,correctLabel:'Gone down — high school use fell from 27.5% (2019) to 7.8% (2024)'},
+      {id:'exposure',type:'choice',
+       q:'In the last month, how often have you seen vaping content on social media?',
+       choices:['Daily or almost daily','A few times a week','A few times total','Never'],
+       research:true},
+      {id:'grade',type:'choice',
+       q:'Last one — what grade are you in?',
+       choices:['9th','10th','11th','12th','Other / not in HS'],
+       research:true}
+    ];
+    var REALS={prevalence:6,cost:1560,quit:47,flavored:88};
+    var answers={};
+    var step=0;
+    var stepsWrap=$('surveySteps'),prog=$('progFill');
+    var TOTAL=QUESTIONS.length;
+
+    function renderStep(){
+      prog.style.width=Math.round((step)/(TOTAL)*100)+'%';
+      stepsWrap.innerHTML='';
+      var qs=QUESTIONS[step];
+      var div=document.createElement('div');
+      div.className='q-step active';
+      var head='<div class="q-num">Question '+(step+1)+' of '+TOTAL+(qs.research?' · helps our research':'')+'</div>'+
+        '<p class="q-text">'+qs.q+'</p>'+(qs.help?'<p class="q-help">'+qs.help+'</p>':'');
+      if(qs.type==='slider'){
+        var startVal=answers[qs.id]!==undefined?answers[qs.id]:qs.start;
+        div.innerHTML=head+
+          '<div class="ctrl"><div class="ctrl-head"><label for="sq">Your answer</label>'+
+          '<span class="readout" id="sqOut">'+qs.fmt(startVal)+'</span></div>'+
+          '<input type="range" id="sq" class="teal" min="'+qs.min+'" max="'+qs.max+'" step="'+(qs.step||1)+'" value="'+startVal+'">'+
+          '<div class="scale"><span>'+qs.fmt(qs.min)+'</span><span>'+qs.fmt(qs.max)+'</span></div></div>'+
+          navHTML();
+        stepsWrap.appendChild(div);
+        var sq=$('sq'),sqOut=$('sqOut');
+        setFill(sq);
+        sq.addEventListener('input',function(){sqOut.textContent=qs.fmt(+sq.value);setFill(sq);});
+        $('nextBtn').addEventListener('click',function(){answers[qs.id]=+sq.value;advance();});
+      } else {
+        var chHtml='<div class="choices" id="choices">';
+        qs.choices.forEach(function(c,i){
+          var sel=answers[qs.id]===i?' aria-pressed="true"':' aria-pressed="false"';
+          chHtml+='<button class="choice" type="button" data-i="'+i+'"'+sel+'>'+c+'</button>';
+        });
+        chHtml+='</div>';
+        div.innerHTML=head+chHtml+navHTML(true);
+        stepsWrap.appendChild(div);
+        var nextBtn=$('nextBtn');
+        nextBtn.disabled=answers[qs.id]===undefined;
+        nextBtn.style.opacity=nextBtn.disabled?'.45':'1';
+        [].slice.call(div.querySelectorAll('.choice')).forEach(function(cb){
+          cb.addEventListener('click',function(){
+            answers[qs.id]=+cb.getAttribute('data-i');
+            [].slice.call(div.querySelectorAll('.choice')).forEach(function(o){o.setAttribute('aria-pressed',o===cb?'true':'false');});
+            nextBtn.disabled=false;nextBtn.style.opacity='1';
+          });
+        });
+        nextBtn.addEventListener('click',function(){if(answers[qs.id]!==undefined)advance();});
+      }
+      if(step>0){$('backBtn').addEventListener('click',function(){step--;renderStep();});}
+    }
+    function navHTML(){
+      return '<div class="q-nav">'+
+        (step>0?'<button class="btn ghost" id="backBtn" type="button">← Back</button>':'<span></span>')+
+        '<button class="btn gain" id="nextBtn" type="button">'+(step===TOTAL-1?'See my results →':'Next →')+'</button></div>';
+    }
+    function advance(){
+      if(step<TOTAL-1){step++;renderStep();}
+      else{showResults();}
+    }
+
+    function pct(v,max){return Math.max(0,Math.min(100,v/max*100));}
+    function gapScore(){
+      // 0 = perfectly calibrated, 100 = maximally off, across the 4 numeric gaps
+      var gaps=[
+        Math.abs(answers.prevalence-REALS.prevalence)/100,
+        Math.abs(answers.cost-REALS.cost)/5000,
+        Math.abs(answers.quit-REALS.quit)/100,
+        Math.abs(answers.flavored-REALS.flavored)/100
+      ];
+      var avg=gaps.reduce(function(a,b){return a+b;},0)/gaps.length;
+      return Math.round(avg*100);
+    }
+
+    function cmpRow(label,youVal,youPctW,realLabel,realPctW){
+      return '<div class="cmp">'+
+        '<div class="cmp-row you"><span class="who">You</span><span class="cmp-bar"><i data-w="'+youPctW+'"></i></span><span class="val">'+youVal+'</span></div>'+
+        '<div class="cmp-row real"><span class="who">Real</span><span class="cmp-bar"><i data-w="'+realPctW+'"></i></span><span class="val">'+realLabel+'</span></div>'+
+        '</div>';
+    }
+
+    function showResults(){
+      prog.style.width='100%';
+      var score=gapScore();
+      var title,flavor;
+      if(score<=12){title='Sharp Eyes';flavor='You see through most of it. The illusions barely work on you — now help break them for everyone else.';}
+      else if(score<=30){title='Half-Fooled';flavor='Some illusions got you, some didn\u2019t. That\u2019s exactly why we\u2019re building this — the gaps are invisible until you measure them.';}
+      else{title='Fully Illusioned';flavor='The illusions had you — which puts you with the majority. Nothing wrong with your eyes; this is what marketing and rumor are engineered to do.';}
+
+      var costReal=1560;
+      var html='<div class="q-step active">'+
+        '<div class="score-hero"><div class="sc">'+(100-score)+'/100</div><div class="sl">Perception accuracy · '+title+'</div></div>'+
+        '<p class="verdict" style="text-align:center;max-width:46ch;margin:10px auto 4px">'+flavor+'</p>';
+
+      html+='<div class="res-card"><div class="rq">How many in 100 students vape?</div>'+
+        cmpRow('prev',answers.prevalence+' in 100',pct(answers.prevalence,100),'6 in 100',pct(6,100))+
+        '<p class="verdict">'+(answers.prevalence>6?'You guessed <b>'+(answers.prevalence-6)+' too high</b> — the classic illusion. Feeling like "everyone does it" is one of the strongest predictors of starting.':'You were at or under the real number — genuinely rare.')+'</p></div>';
+
+      html+='<div class="res-card"><div class="rq">Cost of a typical habit per year</div>'+
+        cmpRow('cost',fmt0.format(answers.cost),pct(answers.cost,5000),fmt0.format(costReal),pct(costReal,5000))+
+        '<p class="verdict">'+(answers.cost<costReal?'You guessed <b>'+fmt0.format(costReal-answers.cost)+' low</b>. Paying $15 at a time hides the real total — that\u2019s the design.':'You guessed at or above the real figure — you see the drain clearly.')+'</p></div>';
+
+      html+='<div class="res-card"><div class="rq">% of daily users who succeed when they try to quit</div>'+
+        cmpRow('quit',answers.quit+'%',pct(answers.quit,100),'~47%',pct(47,100))+
+        '<p class="verdict">'+(answers.quit>47?'You guessed quitting is <b>easier</b> than it is — over half of daily users who tried couldn\u2019t. "I can stop whenever" is the most dangerous illusion of all.':'You guessed at or below reality — you already sense how hard nicotine holds on.')+'</p></div>';
+
+      html+='<div class="res-card"><div class="rq">% of teen vapers using flavored products</div>'+
+        cmpRow('flav',answers.flavored+'%',pct(answers.flavored,100),'87.6%',pct(87.6,100))+
+        '<p class="verdict">'+(answers.flavored<80?'Higher than you thought — flavors aren\u2019t a side detail, they\u2019re the product\u2019s main hook, which is why NY banned them.':'You called it — flavors are the on-ramp, and you knew.')+'</p></div>';
+
+      var harmRight=answers.harm===3;
+      html+='<div class="res-card"><div class="rq">Has teen vaping gone up or down?</div>'+
+        '<p class="verdict">'+(harmRight?'<b>You got it — it\u2019s gone down</b>, from 27.5% of high schoolers in 2019 to 7.8% in 2024. Policy and changing norms work.':'<b>It\u2019s actually gone down</b> — from 27.5% of high schoolers in 2019 to 7.8% in 2024. Most people assume the opposite; good news travels slowest.')+'</p></div>';
+
+      html+='<div class="export-row">'+
+        '<button class="btn gain" id="dlBtn" type="button">Download my response (JSON)</button>'+
+        '<button class="btn ghost" id="againBtn" type="button">Retake</button>'+
+        '</div>'+
+        '<p class="saved-count" id="savedCount"></p>'+
+        '<p class="verdict" style="text-align:center;margin-top:14px">Want to do something with what you just learned? <a href="#help" style="color:var(--gain)">The help section</a> has free, anonymous support — for you or someone you know.</p>'+
+        '</div>';
+
+      stepsWrap.innerHTML=html;
+
+      // animate comparison bars
+      var bars=[].slice.call(stepsWrap.querySelectorAll('.cmp-bar i'));
+      requestAnimationFrame(function(){setTimeout(function(){
+        bars.forEach(function(b){b.style.width=b.getAttribute('data-w')+'%';});
+      },reduceMotion?0:80);});
+
+      // persist locally (best-effort; in-memory fallback)
+      var record={project:'vaping-illusion-survey',version:2,timestamp:new Date().toISOString(),answers:answers,score:100-score};
+      var count=null;
+      try{
+        var key='vi_survey_responses';
+        var arr=JSON.parse(localStorage.getItem(key)||'[]');
+        arr.push(record);
+        localStorage.setItem(key,JSON.stringify(arr));
+        count=arr.length;
+      }catch(e){/* storage unavailable — memory only */}
+      if(count!==null){$('savedCount').textContent=count+' response'+(count===1?'':'s')+' saved on this device.';}
+
+      // send to the team's live Google Sheet, if configured
+      if(SHEET_ENDPOINT){
+        var sc=$('savedCount');
+        var base=sc.textContent?sc.textContent+' · ':'';
+        sc.textContent=base+'Sending to team database…';
+        fetch(SHEET_ENDPOINT,{method:'POST',mode:'no-cors',
+          headers:{'Content-Type':'text/plain;charset=utf-8'},
+          body:JSON.stringify(record)})
+        .then(function(){sc.textContent=base+'✓ Submitted to the team database. Thank you!';})
+        .catch(function(){sc.textContent=base+'Couldn\u2019t reach the team database — use the download button instead.';});
+      }
+
+      $('dlBtn').addEventListener('click',function(){
+        var blob=new Blob([JSON.stringify(record,null,2)],{type:'application/json'});
+        var a=document.createElement('a');
+        a.href=URL.createObjectURL(blob);
+        a.download='vaping-illusion-response-'+Date.now()+'.json';
+        document.body.appendChild(a);a.click();
+        setTimeout(function(){URL.revokeObjectURL(a.href);a.remove();},500);
+      });
+      $('againBtn').addEventListener('click',function(){answers={};step=0;renderStep();});
+    }
+
+    renderStep();
+  })();
+})();
+</script>
+</body>
+</html>
